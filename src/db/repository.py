@@ -77,6 +77,7 @@ class Repository:
             c.last_activity_at,
             c.feed_posts_30d,
             c.chat_messages_30d,
+            c.engagement_count,
             (
                 SELECT COUNT(*)
                 FROM circle_topics ct
@@ -107,12 +108,11 @@ class Repository:
           -- Hard Filter: Capacity Constraints
           AND (
               c.max_members IS NULL 
-              OR c.member_count < c.max_members 
-              OR c.join_policy = 'request'
+              OR c.member_count < c.max_members
           )
           
           -- Hard Filter: Inactive Circles
-          AND (c.feed_posts_30d + c.chat_messages_30d) > 0
+          AND (c.feed_posts_30d + c.chat_messages_30d + c.engagement_count) > 0
           
           -- Hard Filter: Already a Member
           AND NOT EXISTS (

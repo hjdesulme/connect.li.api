@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS circles (
     member_count INTEGER NOT NULL DEFAULT 0,
     last_activity_at DATETIME,
     feed_posts_30d INTEGER NOT NULL DEFAULT 0,
-    chat_messages_30d INTEGER NOT NULL DEFAULT 0
+    chat_messages_30d INTEGER NOT NULL DEFAULT 0,
+    engagement_count INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS topics (

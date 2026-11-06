@@ -48,6 +48,7 @@ class CandidateCircle(BaseModel):
     last_activity_at: Optional[str] = None
     feed_posts_30d: int
     chat_messages_30d: int
+    engagement_count: int
     circle_topics: Optional[str] = None
 
     # Computed strictly via SQL CTE
