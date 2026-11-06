@@ -124,7 +124,7 @@ class Repository:
 
         cursor = self.conn.cursor()
         cursor.execute(query, {"user_id": user_id})
-        
-        # Pydantic models automatically cast SQLite's 1/0 integers to booleans 
+
+        # Pydantic models automatically cast SQLite's 1/0 integers to booleans
         # for industry_match and location_match.
         return [CandidateCircle(**dict(row)) for row in cursor.fetchall()]

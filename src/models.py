@@ -21,11 +21,15 @@ class FormatType(str, Enum):
 
 class RecommendationParams(BaseModel):
     """Query parameters to validate the recommendation requests."""
-    limit: int = Field(default=10, ge=1, le=50, description="Max number of circles to recommend")
+
+    limit: int = Field(
+        default=10, ge=1, le=50, description="Max number of circles to recommend"
+    )
 
 
 class CandidateCircle(BaseModel):
     """Internal model representing a circle extracted from the DB CTE."""
+
     id: int
     name: Optional[str] = None
     description: Optional[str] = None
@@ -38,7 +42,7 @@ class CandidateCircle(BaseModel):
     feed_posts_30d: int
     chat_messages_30d: int
     circle_topics: Optional[str] = None
-    
+
     # Computed strictly via SQL CTE
     topic_overlap_count: int
     industry_match: bool

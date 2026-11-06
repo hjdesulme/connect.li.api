@@ -14,7 +14,12 @@ def test_seed_database(tmp_path: Path):
     # 1. Mock topics.json
     topics = [
         {"id": 1, "slug": "leadership", "label": "Leadership", "domain": "content"},
-        {"id": 2, "slug": "public-speaking", "label": "Public Speaking", "domain": "content"},
+        {
+            "id": 2,
+            "slug": "public-speaking",
+            "label": "Public Speaking",
+            "domain": "content",
+        },
     ]
     with open(data_dir / "topics.json", "w") as f:
         json.dump(topics, f)
@@ -49,9 +54,7 @@ def test_seed_database(tmp_path: Path):
         json.dump(circles, f)
 
     # 4. Mock memberships.json
-    memberships = [
-        {"user_id": 42, "circle_id": 1, "role": "member"}
-    ]
+    memberships = [{"user_id": 42, "circle_id": 1, "role": "member"}]
     with open(data_dir / "memberships.json", "w") as f:
         json.dump(memberships, f)
 
@@ -89,7 +92,7 @@ def test_seed_database(tmp_path: Path):
     assert db_circle["member_count"] == 1
     assert db_circle["feed_posts_30d"] == 10
 
-    # Verify Circle Topics Normalization 
+    # Verify Circle Topics Normalization
     cursor.execute("SELECT topic_slug FROM circle_topics WHERE circle_id = 1")
     db_circle_topics = cursor.fetchall()
     circle_topic_slugs = {r["topic_slug"] for r in db_circle_topics}
