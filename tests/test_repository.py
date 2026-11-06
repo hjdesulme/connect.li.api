@@ -88,3 +88,4 @@ def test_get_candidate_circles_cte_scenario_23():
     assert healthy_circle.topic_overlap_count == 1
     assert healthy_circle.industry_match is True  # User industry 'Tech' == Leader industry 'Tech'
     assert healthy_circle.location_match is True  # User location 'New York' == Leader location 'New York'
+    assert healthy_circle.circle_topics == "getting-promoted"

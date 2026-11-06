@@ -1,6 +1,6 @@
 import math
 from src.models import CandidateCircle, AccessType, JoinPolicyType, ScoreBreakdown
-from src.scorer import compute_base_score, sort_candidates
+from src.scorer import compute_base_score, sort_candidates, apply_mmr, jaccard_similarity
 
 def test_topic_score():
     circle = CandidateCircle(
@@ -178,3 +178,70 @@ def test_candidate_sorting():
     assert sorted_candidates[1][0].id == 1
     assert sorted_candidates[2][0].id == 2
     assert sorted_candidates[3][0].id == 10
+
+def test_jaccard_similarity():
+    assert jaccard_similarity(set(), set()) == 0.0
+    assert jaccard_similarity({"a"}, set()) == 0.0
+    assert jaccard_similarity({"a", "b"}, {"b"}) == 0.5
+    assert jaccard_similarity({"a"}, {"a"}) == 1.0
+
+
+def test_greedy_mmr_diversity():
+    # User 15 Duplicate Scenario: 3 Negotiation circles, 1 alternative circle
+    # All base scores might be similar, but MMR should push down the duplicates.
+    
+    # 1. Duplicate A (Score 0.8)
+    c1 = CandidateCircle(
+        id=10, access=AccessType.PUBLIC, join_policy=JoinPolicyType.OPEN, member_count=5,
+        feed_posts_30d=10, chat_messages_30d=10, topic_overlap_count=1,
+        industry_match=False, location_match=False, circle_topics="negotiation"
+    )
+    b1 = ScoreBreakdown(base_score=0.8, topic_score=0.5, demo_score=0.0, act_score=0.5)
+
+    # 2. Duplicate B (Score 0.79)
+    c2 = CandidateCircle(
+        id=11, access=AccessType.PUBLIC, join_policy=JoinPolicyType.OPEN, member_count=5,
+        feed_posts_30d=9, chat_messages_30d=10, topic_overlap_count=1,
+        industry_match=False, location_match=False, circle_topics="negotiation"
+    )
+    b2 = ScoreBreakdown(base_score=0.79, topic_score=0.5, demo_score=0.0, act_score=0.49)
+
+    # 3. Duplicate C (Score 0.78)
+    c3 = CandidateCircle(
+        id=12, access=AccessType.PUBLIC, join_policy=JoinPolicyType.OPEN, member_count=5,
+        feed_posts_30d=9, chat_messages_30d=9, topic_overlap_count=1,
+        industry_match=False, location_match=False, circle_topics="negotiation"
+    )
+    b3 = ScoreBreakdown(base_score=0.78, topic_score=0.5, demo_score=0.0, act_score=0.48)
+    
+    # 4. Distinct Alternative (Score 0.70)
+    c4 = CandidateCircle(
+        id=13, access=AccessType.PUBLIC, join_policy=JoinPolicyType.OPEN, member_count=5,
+        feed_posts_30d=5, chat_messages_30d=5, topic_overlap_count=1,
+        industry_match=False, location_match=False, circle_topics="leadership-skills"
+    )
+    b4 = ScoreBreakdown(base_score=0.70, topic_score=0.5, demo_score=0.0, act_score=0.40)
+
+    # Note: the input to apply_mmr must be sorted by base_score DESC
+    candidates = [(c1, b1), (c2, b2), (c3, b3), (c4, b4)]
+    
+    reordered = apply_mmr(candidates, k=50)
+
+    # First one picked should be Duplicate A (highest base score, no penalty)
+    assert reordered[0][0].id == 10
+    assert reordered[0][1].mmr_penalty_applied is False
+    
+    # Selected topics is now {"negotiation"}
+    # Duplicate B adjusted score: 0.75 * 0.79 - 0.25 * 1.0 = 0.5925 - 0.25 = 0.3425
+    # Distinct adjusted score: 0.75 * 0.70 - 0.25 * 0.0 = 0.525
+    # So Distinct should be picked second!
+    assert reordered[1][0].id == 13
+    assert reordered[1][1].mmr_penalty_applied is False # 0 penalty because intersection is 0
+    
+    # Third should be Duplicate B, it will have a penalty applied
+    assert reordered[2][0].id == 11
+    assert reordered[2][1].mmr_penalty_applied is True
+    
+    # Fourth should be Duplicate C
+    assert reordered[3][0].id == 12
+    assert reordered[3][1].mmr_penalty_applied is True

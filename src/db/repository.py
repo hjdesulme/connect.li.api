@@ -66,7 +66,12 @@ class Repository:
                 FROM circle_leaders cl
                 JOIN user_info ui ON (cl.location = ui.location AND ui.location IS NOT NULL)
                 WHERE cl.circle_id = c.id
-            ) AS location_match
+            ) AS location_match,
+            (
+                SELECT GROUP_CONCAT(ct.topic_slug)
+                FROM circle_topics ct
+                WHERE ct.circle_id = c.id
+            ) AS circle_topics
         FROM circles c
         WHERE c.access IN ('public', 'unlisted')
           AND c.join_policy IN ('open', 'request')

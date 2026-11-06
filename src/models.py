@@ -36,6 +36,7 @@ class CandidateCircle(BaseModel):
     last_activity_at: Optional[str] = None
     feed_posts_30d: int
     chat_messages_30d: int
+    circle_topics: Optional[str] = None
     
     # Computed strictly via SQL CTE
     topic_overlap_count: int
