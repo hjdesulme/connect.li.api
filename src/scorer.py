@@ -1,4 +1,5 @@
 import math
+from typing import List, Tuple
 from src.models import CandidateCircle, ScoreBreakdown
 
 def compute_base_score(circle: CandidateCircle) -> ScoreBreakdown:
@@ -15,10 +16,31 @@ def compute_base_score(circle: CandidateCircle) -> ScoreBreakdown:
     # Total_Score = (0.5 * Score_topic) + (0.2 * Score_demo) + (0.3 * Score_act)
     base_score = (0.5 * topic_score) + (0.2 * demo_score) + (0.3 * act_score)
     
+    # Cold-Start Fallback:
+    if topic_score == 0.0 and demo_score == 0.0:
+        base_score = act_score
+    
     return ScoreBreakdown(
         base_score=base_score,
         topic_score=topic_score,
         demo_score=demo_score,
         act_score=act_score,
         mmr_penalty_applied=False
+    )
+
+
+def sort_candidates(
+    candidates: List[Tuple[CandidateCircle, ScoreBreakdown]]
+) -> List[Tuple[CandidateCircle, ScoreBreakdown]]:
+    """
+    Sorts candidates by Total Score DESC, last_activity_at DESC, id ASC
+    """
+    return sorted(
+        candidates,
+        key=lambda x: (
+            x[1].base_score,
+            x[0].last_activity_at or "",
+            -x[0].id
+        ),
+        reverse=True
     )
