@@ -13,6 +13,14 @@ class Repository:
         self.conn = conn
         self.conn.row_factory = sqlite3.Row
 
+    def user_exists(self, user_id: int) -> bool:
+        """
+        Checks if a user exists in the database.
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT 1 FROM users WHERE id = :user_id", {"user_id": user_id})
+        return cursor.fetchone() is not None
+
     def get_candidate_circles_cte(self, user_id: int) -> List[CandidateCircle]:
         """
         Executes a single parameterized SQL query using Common Table Expressions (CTEs)
@@ -41,6 +49,7 @@ class Repository:
         SELECT 
             c.id,
             c.name,
+            c.description,
             c.access,
             c.join_policy,
             c.format,
