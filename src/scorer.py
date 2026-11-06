@@ -44,3 +44,57 @@ def sort_candidates(
         ),
         reverse=True
     )
+
+
+def jaccard_similarity(set_a: set, set_b: set) -> float:
+    if not set_a and not set_b:
+        return 0.0
+    intersection = len(set_a.intersection(set_b))
+    union = len(set_a.union(set_b))
+    return intersection / union if union > 0 else 0.0
+
+
+def apply_mmr(
+    candidates: List[Tuple[CandidateCircle, ScoreBreakdown]],
+    k: int = 50
+) -> List[Tuple[CandidateCircle, ScoreBreakdown]]:
+    """
+    Applies Greedy MMR Diversity over the Top K candidates.
+    Assumes candidates is already sorted by base score & tie-breakers.
+    """
+    pool = candidates[:k]
+    tail = candidates[k:]
+    
+    selected_candidates = []
+    selected_topics = set()
+    
+    while pool:
+        best_idx = -1
+        best_score = -float('inf')
+        best_penalty = 0.0
+        
+        for i, (circle, breakdown) in enumerate(pool):
+            c_topics = set(circle.circle_topics.split(",")) if circle.circle_topics else set()
+            
+            penalty = 0.0
+            if selected_topics:
+                penalty = jaccard_similarity(c_topics, selected_topics)
+                
+            adjusted_score = (0.75 * breakdown.base_score) - (0.25 * penalty)
+            
+            if adjusted_score > best_score:
+                best_score = adjusted_score
+                best_idx = i
+                best_penalty = penalty
+                
+        winner_circle, winner_breakdown = pool.pop(best_idx)
+        
+        if best_penalty > 0:
+            winner_breakdown.mmr_penalty_applied = True
+            
+        selected_candidates.append((winner_circle, winner_breakdown))
+        
+        c_topics = set(winner_circle.circle_topics.split(",")) if winner_circle.circle_topics else set()
+        selected_topics.update(c_topics)
+        
+    return selected_candidates + tail
