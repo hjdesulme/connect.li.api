@@ -1,29 +1,24 @@
-# Node / Frontend
-dist/
-dist-ssr/
-*.local
-node_modules/
-
-# Python / Backend
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-.pytest_cache/
-.coverage
-.ruff_cache/
-env/
-venv/
-__pycache__/
-dist/
-build/
-*.spec
-logs/
-test_epistemic.db
-epistemic.db
-exports/
+*.so
 
-# OS / Editor
+# Virtual Environments
+.venv/
+venv/
+ENV/
+
+# Testing & Linting
+.pytest_cache/
+.ruff_cache/
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# OS Files
 .DS_Store
-.vscode/
-*.swp
+
 /ignore
