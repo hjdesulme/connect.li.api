@@ -2,7 +2,7 @@ import math
 from typing import List, Tuple
 from src.models import CandidateCircle, ScoreBreakdown
 
-def compute_base_score(circle: CandidateCircle) -> ScoreBreakdown:
+def compute_base_score(circle: CandidateCircle, is_cold_start: bool = False) -> ScoreBreakdown:
     # Score_topic: min(overlap_count, 5) / 5.0
     topic_score = min(circle.topic_overlap_count, 5) / 5.0
     
@@ -17,7 +17,7 @@ def compute_base_score(circle: CandidateCircle) -> ScoreBreakdown:
     base_score = (0.5 * topic_score) + (0.2 * demo_score) + (0.3 * act_score)
     
     # Cold-Start Fallback:
-    if topic_score == 0.0 and demo_score == 0.0:
+    if is_cold_start:
         base_score = act_score
     
     return ScoreBreakdown(
@@ -25,6 +25,7 @@ def compute_base_score(circle: CandidateCircle) -> ScoreBreakdown:
         topic_score=topic_score,
         demo_score=demo_score,
         act_score=act_score,
+        is_cold_start=is_cold_start,
         mmr_penalty_applied=False
     )
 

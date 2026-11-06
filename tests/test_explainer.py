@@ -19,7 +19,9 @@ def create_dummy_circle():
 
 def test_cold_start_explanation():
     circle = create_dummy_circle()
-    breakdown = ScoreBreakdown(base_score=1.0, topic_score=0.0, demo_score=0.0, act_score=1.0)
+    breakdown = ScoreBreakdown(
+        base_score=1.0, topic_score=0.0, demo_score=0.0, act_score=1.0, is_cold_start=True
+    )
     assert generate_explanation(circle, breakdown) == "A highly active community to help you get started."
 
 
