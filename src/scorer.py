@@ -12,8 +12,8 @@ def compute_base_score(
     # Score_demo: 1.0 if user industry/location matches, else 0.0
     demo_score = 1.0 if (circle.industry_match or circle.location_match) else 0.0
 
-    # Score_act: min(log10(1 + posts + chats) / 3.0, 1.0)
-    total_activity = circle.feed_posts_30d + circle.chat_messages_30d
+    # Score_act: min(log10(1 + posts + chats + engagements) / 3.0, 1.0)
+    total_activity = circle.feed_posts_30d + circle.chat_messages_30d + circle.engagement_count
     act_score = min(math.log10(1 + total_activity) / 3.0, 1.0)
 
     # Total_Score = (0.5 * Score_topic) + (0.2 * Score_demo) + (0.3 * Score_act)

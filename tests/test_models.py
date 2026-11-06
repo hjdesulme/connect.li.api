@@ -63,6 +63,7 @@ def test_candidate_circle_validation():
         "member_count": 5,
         "feed_posts_30d": 10,
         "chat_messages_30d": 2,
+        "engagement_count": 0,
         "topic_overlap_count": 3,
         "industry_match": True,
         "location_match": False,

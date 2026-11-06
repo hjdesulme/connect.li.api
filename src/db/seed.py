@@ -12,6 +12,7 @@ def seed_db(db_path: Path, data_dir: Path, schema_path: Path):
         db_path.unlink()
 
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA foreign_keys = ON;")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
@@ -29,6 +30,10 @@ def seed_db(db_path: Path, data_dir: Path, schema_path: Path):
                     "INSERT INTO topics (slug, label, domain) VALUES (?, ?, ?)",
                     (t.get("slug"), t.get("label"), t.get("domain")),
                 )
+
+    # Load valid topics for normalization checks early
+    cursor.execute("SELECT slug FROM topics")
+    valid_topics = {row["slug"] for row in cursor.fetchall()}
 
     # 3. Seed Users and User Topics
     users_file = data_dir / "users.json"
@@ -51,14 +56,11 @@ def seed_db(db_path: Path, data_dir: Path, schema_path: Path):
                     ),
                 )
                 for slug in u.get("topic_interests", []):
-                    cursor.execute(
-                        "INSERT OR IGNORE INTO user_topics (user_id, topic_slug) VALUES (?, ?)",
-                        (u.get("id"), slug),
-                    )
-
-    # Load valid topics for normalization checks
-    cursor.execute("SELECT slug FROM topics")
-    valid_topics = {row["slug"] for row in cursor.fetchall()}
+                    if slug in valid_topics:
+                        cursor.execute(
+                            "INSERT OR IGNORE INTO user_topics (user_id, topic_slug) VALUES (?, ?)",
+                            (u.get("id"), slug),
+                        )
 
     # 4. Seed Circles and Normalize Circle Topics
     circles_file = data_dir / "circles.json"
@@ -116,7 +118,24 @@ def seed_db(db_path: Path, data_dir: Path, schema_path: Path):
                     (m.get("user_id"), m.get("circle_id"), m.get("role")),
                 )
 
-    # 6. Correct member_count to reflect the true totals from circles.json
+    # 6. Seed Activity Data (Engagement)
+    activity_file = data_dir / "activity.json"
+    if activity_file.exists():
+        with open(activity_file, "r", encoding="utf-8") as f:
+            activities = json.load(f)
+            engagement_by_circle = {}
+            for act in activities:
+                cid = act.get("circle_id")
+                eng = act.get("reaction_count", 0) + act.get("comment_count", 0) + act.get("save_count", 0)
+                engagement_by_circle[cid] = engagement_by_circle.get(cid, 0) + eng
+                
+            for cid, total_eng in engagement_by_circle.items():
+                cursor.execute(
+                    "UPDATE circles SET engagement_count = ? WHERE id = ?",
+                    (total_eng, cid)
+                )
+
+    # 7. Correct member_count to reflect the true totals from circles.json
     # (Overwrites trigger behavior to ensure data exactly matches the provided snapshot)
     if circles_file.exists():
         with open(circles_file, "r", encoding="utf-8") as f:

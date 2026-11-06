@@ -10,6 +10,7 @@ def create_dummy_circle():
         member_count=0,
         feed_posts_30d=10,
         chat_messages_30d=10,
+        engagement_count=0,
         topic_overlap_count=0,
         industry_match=False,
         location_match=False,

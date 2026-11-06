@@ -45,7 +45,7 @@ def test_get_candidate_circles_cte_scenario_23():
     cursor.execute(
         """
         INSERT INTO circles (id, name, access, join_policy, max_members, feed_posts_30d) 
-        VALUES (20, 'The Promotion Path', 'public', 'open', 1, 10)
+        VALUES (20, 'The Promotion Path', 'public', 'request', 1, 10)
         """
     )
     # Inserting membership triggers `member_count = 1`, filling capacity

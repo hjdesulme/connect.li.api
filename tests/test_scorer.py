@@ -16,6 +16,7 @@ def test_topic_score():
         member_count=0,
         feed_posts_30d=0,
         chat_messages_30d=0,
+        engagement_count=0,
         topic_overlap_count=3,
         industry_match=False,
         location_match=False,
@@ -37,6 +38,7 @@ def test_demographic_score():
         member_count=0,
         feed_posts_30d=0,
         chat_messages_30d=0,
+        engagement_count=0,
         topic_overlap_count=0,
         industry_match=True,
         location_match=False,
@@ -62,8 +64,9 @@ def test_activity_score():
         access=AccessType.PUBLIC,
         join_policy=JoinPolicyType.OPEN,
         member_count=0,
-        feed_posts_30d=99,
+        feed_posts_30d=90,
         chat_messages_30d=900,
+        engagement_count=9, # 90+900+9 = 999
         topic_overlap_count=0,
         industry_match=False,
         location_match=False,
@@ -73,7 +76,8 @@ def test_activity_score():
     assert math.isclose(breakdown.act_score, 1.0)
 
     circle.feed_posts_30d = 0
-    circle.chat_messages_30d = 9
+    circle.chat_messages_30d = 0
+    circle.engagement_count = 9
     # total = 9, log10(10) = 1. 1/3 = 0.333...
     breakdown = compute_base_score(circle)
     assert math.isclose(breakdown.act_score, 1 / 3.0)
@@ -87,6 +91,7 @@ def test_base_weighting():
         member_count=0,
         feed_posts_30d=9,
         chat_messages_30d=0,
+        engagement_count=0,
         topic_overlap_count=5,  # topic score 1.0
         industry_match=True,  # demo score 1.0
         location_match=False,
@@ -104,8 +109,9 @@ def test_cold_start_fallback_score():
         access=AccessType.PUBLIC,
         join_policy=JoinPolicyType.OPEN,
         member_count=0,
-        feed_posts_30d=99,
+        feed_posts_30d=90,
         chat_messages_30d=900,
+        engagement_count=9,
         topic_overlap_count=0,
         industry_match=False,
         location_match=False,
@@ -126,6 +132,7 @@ def test_candidate_sorting():
         member_count=0,
         feed_posts_30d=0,
         chat_messages_30d=0,
+        engagement_count=0,
         topic_overlap_count=0,
         industry_match=False,
         location_match=False,
@@ -140,6 +147,7 @@ def test_candidate_sorting():
         member_count=0,
         feed_posts_30d=0,
         chat_messages_30d=0,
+        engagement_count=0,
         topic_overlap_count=0,
         industry_match=False,
         location_match=False,
@@ -154,6 +162,7 @@ def test_candidate_sorting():
         member_count=0,
         feed_posts_30d=0,
         chat_messages_30d=0,
+        engagement_count=0,
         topic_overlap_count=0,
         industry_match=False,
         location_match=False,
@@ -168,6 +177,7 @@ def test_candidate_sorting():
         member_count=0,
         feed_posts_30d=0,
         chat_messages_30d=0,
+        engagement_count=0,
         topic_overlap_count=0,
         industry_match=False,
         location_match=False,
@@ -208,6 +218,7 @@ def test_greedy_mmr_diversity():
         member_count=5,
         feed_posts_30d=10,
         chat_messages_30d=10,
+        engagement_count=0,
         topic_overlap_count=1,
         industry_match=False,
         location_match=False,
@@ -223,6 +234,7 @@ def test_greedy_mmr_diversity():
         member_count=5,
         feed_posts_30d=9,
         chat_messages_30d=10,
+        engagement_count=0,
         topic_overlap_count=1,
         industry_match=False,
         location_match=False,
@@ -240,6 +252,7 @@ def test_greedy_mmr_diversity():
         member_count=5,
         feed_posts_30d=9,
         chat_messages_30d=9,
+        engagement_count=0,
         topic_overlap_count=1,
         industry_match=False,
         location_match=False,
@@ -257,6 +270,7 @@ def test_greedy_mmr_diversity():
         member_count=5,
         feed_posts_30d=5,
         chat_messages_30d=5,
+        engagement_count=0,
         topic_overlap_count=1,
         industry_match=False,
         location_match=False,

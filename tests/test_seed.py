@@ -85,6 +85,8 @@ def test_seed_database(tmp_path: Path):
     db_user_topics = cursor.fetchall()
     user_topic_slugs = [r["topic_slug"] for r in db_user_topics]
     assert "leadership" in user_topic_slugs
+    assert "invalid-topic" not in user_topic_slugs
+    assert len(user_topic_slugs) == 1
 
     # Verify Circles (member_count should be exactly 1 via our SQLite trigger)
     cursor.execute("SELECT * FROM circles WHERE id = 1")

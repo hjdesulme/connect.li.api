@@ -109,7 +109,7 @@ def fixture_test_db():
 
     # Circle 20 (Full)
     cursor.execute(
-        "INSERT INTO circles (id, name, access, join_policy, max_members, feed_posts_30d, chat_messages_30d) VALUES (20, 'The Promotion Path', 'public', 'open', 1, 10, 10)"
+        "INSERT INTO circles (id, name, access, join_policy, max_members, feed_posts_30d, chat_messages_30d) VALUES (20, 'The Promotion Path', 'public', 'request', 1, 10, 10)"
     )
     cursor.execute(
         "INSERT INTO circle_topics (circle_id, topic_slug) VALUES (20, 'getting-promoted')"
