@@ -1,17 +1,17 @@
 import sqlite3
 from pathlib import Path
-from fastapi import FastAPI, APIRouter, Depends, HTTPException
+
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
 
 from src.db.repository import Repository
+from src.explainer import generate_explanation
 from src.models import (
+    RecommendationExplanation,
     RecommendationParams,
     RecommendationResponse,
     RecommendedCircle,
-    RecommendationExplanation,
 )
-from src.scorer import compute_base_score, sort_candidates, apply_mmr
-from src.explainer import generate_explanation
-
+from src.scorer import apply_mmr, compute_base_score, sort_candidates
 
 app = FastAPI(
     title="Lean In Connect API",
@@ -22,7 +22,7 @@ app = FastAPI(
 
 def get_db():
     """Database connection dependency for FastAPI routes."""
-    db_path = Path(__file__).parent / "db" / "connect.db"
+    db_path = Path(__file__).resolve().parent / "db" / "connect.db"
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     try:
@@ -42,8 +42,8 @@ v1_router = APIRouter(prefix="/v1")
 )
 def get_recommendations(
     user_id: int,
-    params: RecommendationParams = Depends(),
-    db: sqlite3.Connection = Depends(get_db),
+    params: RecommendationParams = Depends(),  # noqa: B008
+    db: sqlite3.Connection = Depends(get_db),  # noqa: B008
 ):
     """
     Returns a mathematically ranked, MMR-diversified list of recommended Circles for a user.

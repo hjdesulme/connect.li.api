@@ -1,5 +1,6 @@
 from enum import Enum
-from typing import List, Optional, Any
+from typing import Any
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -38,18 +39,18 @@ class CandidateCircle(BaseModel):
     """Internal model representing a circle extracted from the DB CTE."""
 
     id: int
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: str | None = None
+    description: str | None = None
     access: AccessType
     join_policy: JoinPolicyType
-    format: Optional[FormatType] = None
-    max_members: Optional[int] = None
+    format: FormatType | None = None
+    max_members: int | None = None
     member_count: int
-    last_activity_at: Optional[str] = None
+    last_activity_at: str | None = None
     feed_posts_30d: int
     chat_messages_30d: int
     engagement_count: int
-    circle_topics: Optional[str] = None
+    circle_topics: str | None = None
 
     # Computed strictly via SQL CTE
     topic_overlap_count: int
@@ -72,11 +73,11 @@ class RecommendationExplanation(BaseModel):
 
 class RecommendedCircle(BaseModel):
     id: int
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: str | None = None
+    description: str | None = None
     explanation: RecommendationExplanation
 
 
 class RecommendationResponse(BaseModel):
     user_id: int
-    recommendations: List[RecommendedCircle]
+    recommendations: list[RecommendedCircle]

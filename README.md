@@ -6,6 +6,8 @@ A stateless, RESTful Python API for recommending Lean In Connect Circles to user
 
 This project requires **Python 3.9+** (and standard Unix utilities like `make`). 
 
+**Prerequisite:** Ensure that you have placed the provided `data` folder (containing `users.json`, `circles.json`, etc.) in the root directory of this project. It should look like `./data/users.json`.
+
 To scaffold the virtual environment, install dependencies, and automatically seed the SQLite database from the provided JSON dataset, simply run:
 
 ```bash
@@ -24,6 +26,12 @@ Once running, you can view the interactive Swagger API documentation at [http://
 
 ### Evaluating the Assignment Scenarios
 With the server running locally, you can evaluate the planted scenario records using the following `curl` commands:
+
+**0. Normal User Baseline (User 1)**
+A standard user who has an established profile and some topic interests.
+```bash
+curl -s http://127.0.0.1:8000/v1/recommendations/1?limit=5
+```
 
 **1. Cold-start (User 42)**
 ```bash

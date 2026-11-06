@@ -1,5 +1,5 @@
 import math
-from typing import List, Tuple
+
 from src.models import CandidateCircle, ScoreBreakdown
 
 
@@ -13,7 +13,9 @@ def compute_base_score(
     demo_score = 1.0 if (circle.industry_match or circle.location_match) else 0.0
 
     # Score_act: min(log10(1 + posts + chats + engagements) / 3.0, 1.0)
-    total_activity = circle.feed_posts_30d + circle.chat_messages_30d + circle.engagement_count
+    total_activity = (
+        circle.feed_posts_30d + circle.chat_messages_30d + circle.engagement_count
+    )
     act_score = min(math.log10(1 + total_activity) / 3.0, 1.0)
 
     # Total_Score = (0.5 * Score_topic) + (0.2 * Score_demo) + (0.3 * Score_act)
@@ -34,8 +36,8 @@ def compute_base_score(
 
 
 def sort_candidates(
-    candidates: List[Tuple[CandidateCircle, ScoreBreakdown]],
-) -> List[Tuple[CandidateCircle, ScoreBreakdown]]:
+    candidates: list[tuple[CandidateCircle, ScoreBreakdown]],
+) -> list[tuple[CandidateCircle, ScoreBreakdown]]:
     """
     Sorts candidates by Total Score DESC, last_activity_at DESC, id ASC
     """
@@ -55,8 +57,8 @@ def jaccard_similarity(set_a: set, set_b: set) -> float:
 
 
 def apply_mmr(
-    candidates: List[Tuple[CandidateCircle, ScoreBreakdown]], k: int = 50
-) -> List[Tuple[CandidateCircle, ScoreBreakdown]]:
+    candidates: list[tuple[CandidateCircle, ScoreBreakdown]], k: int = 50
+) -> list[tuple[CandidateCircle, ScoreBreakdown]]:
     """
     Applies Greedy MMR Diversity over the Top K candidates.
     Assumes candidates is already sorted by base score & tie-breakers.

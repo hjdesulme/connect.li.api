@@ -1,6 +1,7 @@
 import json
 import sqlite3
 from pathlib import Path
+
 from src.db.seed import seed_db
 
 
@@ -59,6 +60,22 @@ def test_seed_database(tmp_path: Path):
     with open(data_dir / "memberships.json", "w") as f:
         json.dump(memberships, f)
 
+    # 5. Mock activity.json
+    activity = [
+        {
+            "id": 1,
+            "circle_id": 1,
+            "author_user_id": 42,
+            "body": "Test post",
+            "reaction_count": 5,
+            "comment_count": 2,
+            "save_count": 1,
+            "created_at": "2026-09-01T00:00:00.000Z",
+        }
+    ]
+    with open(data_dir / "activity.json", "w") as f:
+        json.dump(activity, f)
+
     # Run the ETL script
     seed_db(db_path=db_path, data_dir=data_dir, schema_path=schema_path)
 
@@ -94,6 +111,7 @@ def test_seed_database(tmp_path: Path):
     assert db_circle is not None
     assert db_circle["member_count"] == 1
     assert db_circle["feed_posts_30d"] == 10
+    assert db_circle["engagement_count"] == 8
 
     # Verify Circle Topics Normalization
     cursor.execute("SELECT topic_slug FROM circle_topics WHERE circle_id = 1")

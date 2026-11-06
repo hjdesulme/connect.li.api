@@ -3,9 +3,9 @@ from pydantic import ValidationError
 
 from src.models import (
     AccessType,
-    JoinPolicyType,
-    FormatType,
     CandidateCircle,
+    FormatType,
+    JoinPolicyType,
     RecommendationParams,
 )
 

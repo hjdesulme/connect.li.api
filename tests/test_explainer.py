@@ -1,5 +1,5 @@
-from src.models import CandidateCircle, ScoreBreakdown, AccessType, JoinPolicyType
 from src.explainer import generate_explanation
+from src.models import AccessType, CandidateCircle, JoinPolicyType, ScoreBreakdown
 
 
 def create_dummy_circle():

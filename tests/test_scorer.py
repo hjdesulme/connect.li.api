@@ -1,10 +1,11 @@
 import math
-from src.models import CandidateCircle, AccessType, JoinPolicyType, ScoreBreakdown
+
+from src.models import AccessType, CandidateCircle, JoinPolicyType, ScoreBreakdown
 from src.scorer import (
-    compute_base_score,
-    sort_candidates,
     apply_mmr,
+    compute_base_score,
     jaccard_similarity,
+    sort_candidates,
 )
 
 
@@ -66,7 +67,7 @@ def test_activity_score():
         member_count=0,
         feed_posts_30d=90,
         chat_messages_30d=900,
-        engagement_count=9, # 90+900+9 = 999
+        engagement_count=9,  # 90+900+9 = 999
         topic_overlap_count=0,
         industry_match=False,
         location_match=False,
