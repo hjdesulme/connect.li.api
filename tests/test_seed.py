@@ -48,6 +48,7 @@ def test_seed_database(tmp_path: Path):
             "tags": ["public-speaking", "unrecognized-tag"],
             "feed_posts_30d": 10,
             "chat_messages_30d": 5,
+            "member_count": 1,
         }
     ]
     with open(data_dir / "circles.json", "w") as f:

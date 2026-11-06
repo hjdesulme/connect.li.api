@@ -116,6 +116,18 @@ def seed_db(db_path: Path, data_dir: Path, schema_path: Path):
                     (m.get("user_id"), m.get("circle_id"), m.get("role")),
                 )
 
+    # 6. Correct member_count to reflect the true totals from circles.json
+    # (Overwrites trigger behavior to ensure data exactly matches the provided snapshot)
+    if circles_file.exists():
+        with open(circles_file, "r", encoding="utf-8") as f:
+            circles = json.load(f)
+            for c in circles:
+                if "member_count" in c:
+                    cursor.execute(
+                        "UPDATE circles SET member_count = ? WHERE id = ?",
+                        (c["member_count"], c["id"]),
+                    )
+
     conn.commit()
     conn.close()
     print(f"Database seeded successfully at {db_path}")
