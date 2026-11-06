@@ -13,6 +13,33 @@ class Repository:
         self.conn = conn
         self.conn.row_factory = sqlite3.Row
 
+    def user_exists(self, user_id: int) -> bool:
+        """
+        Checks if a user exists in the database.
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT 1 FROM users WHERE id = :user_id", {"user_id": user_id})
+        return cursor.fetchone() is not None
+
+    def is_cold_start_user(self, user_id: int) -> bool:
+        """
+        Checks if a user is a true cold-start (no stated topics, no demographic signals).
+        """
+        cursor = self.conn.cursor()
+        query = """
+            SELECT 
+                (SELECT COUNT(*) FROM user_topics WHERE user_id = :user_id) AS topic_count,
+                industry,
+                location
+            FROM users 
+            WHERE id = :user_id
+        """
+        cursor.execute(query, {"user_id": user_id})
+        row = cursor.fetchone()
+        if not row:
+            return True
+        return row["topic_count"] == 0 and not row["industry"] and not row["location"]
+
     def get_candidate_circles_cte(self, user_id: int) -> List[CandidateCircle]:
         """
         Executes a single parameterized SQL query using Common Table Expressions (CTEs)
@@ -41,6 +68,7 @@ class Repository:
         SELECT 
             c.id,
             c.name,
+            c.description,
             c.access,
             c.join_policy,
             c.format,

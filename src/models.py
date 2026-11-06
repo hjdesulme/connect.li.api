@@ -28,6 +28,7 @@ class CandidateCircle(BaseModel):
     """Internal model representing a circle extracted from the DB CTE."""
     id: int
     name: Optional[str] = None
+    description: Optional[str] = None
     access: AccessType
     join_policy: JoinPolicyType
     format: Optional[FormatType] = None
@@ -49,6 +50,7 @@ class ScoreBreakdown(BaseModel):
     topic_score: float
     demo_score: float
     act_score: float
+    is_cold_start: bool = False
     mmr_penalty_applied: bool = False
 
 

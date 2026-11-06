@@ -102,9 +102,9 @@ def test_cold_start_fallback_score():
         location_match=False
     )
     
-    breakdown = compute_base_score(circle)
+    breakdown = compute_base_score(circle, is_cold_start=True)
     
-    # Because both topic and demo scores are 0, it should fallback perfectly to act_score
+    # Because is_cold_start is True, it should fallback perfectly to act_score
     assert breakdown.base_score == breakdown.act_score
     assert math.isclose(breakdown.base_score, 1.0)
 
