@@ -36,11 +36,20 @@ class CandidateCircle(BaseModel):
     last_activity_at: Optional[str] = None
     feed_posts_30d: int
     chat_messages_30d: int
+    circle_topics: Optional[str] = None
     
     # Computed strictly via SQL CTE
     topic_overlap_count: int
     industry_match: bool
     location_match: bool
+
+
+class ScoreBreakdown(BaseModel):
+    base_score: float
+    topic_score: float
+    demo_score: float
+    act_score: float
+    mmr_penalty_applied: bool = False
 
 
 class RecommendationExplanation(BaseModel):
