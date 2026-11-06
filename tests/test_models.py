@@ -34,6 +34,16 @@ def test_recommendation_params_limit():
     params = RecommendationParams()
     assert params.limit == 10
 
+    # Null/Empty string logic (The Hotfix)
+    params = RecommendationParams(limit=None)
+    assert params.limit == 10
+
+    params = RecommendationParams(limit="")
+    assert params.limit == 10
+
+    params = RecommendationParams(limit="null")
+    assert params.limit == 10
+
     # Invalid limits should trigger validation errors
     with pytest.raises(ValidationError):
         RecommendationParams(limit=0)

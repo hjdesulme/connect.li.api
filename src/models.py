@@ -1,6 +1,6 @@
 from enum import Enum
-from typing import List, Optional
-from pydantic import BaseModel, Field
+from typing import List, Optional, Any
+from pydantic import BaseModel, Field, field_validator
 
 
 class AccessType(str, Enum):
@@ -25,6 +25,13 @@ class RecommendationParams(BaseModel):
     limit: int = Field(
         default=10, ge=1, le=50, description="Max number of circles to recommend"
     )
+
+    @field_validator("limit", mode="before")
+    @classmethod
+    def handle_empty_limit(cls, v: Any) -> Any:
+        if v == "" or v is None or str(v).lower() == "null":
+            return 10
+        return v
 
 
 class CandidateCircle(BaseModel):
