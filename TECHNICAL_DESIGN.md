@@ -5,11 +5,19 @@ I built a stateless, RESTful Python API using **FastAPI** backed by a local **SQ
 
 The API generates human-readable explanations dynamically by tracing the mathematical "score breakdown" (e.g., falling back to a pure-activity score for cold-start users, or penalizing a score to enforce topic diversity).
 
+## Database Schema & Rationale
+The database is fully normalized into 5 tables: `users`, `circles`, `topics`, `user_topics`, and `circle_topics`, alongside a `memberships` junction table. 
+
+**Decisions & Rationale:**
+* **Composite Primary Keys (Indexing):** The junction tables (`user_topics`, `circle_topics`, and `memberships`) utilize composite primary keys (e.g., `PRIMARY KEY (user_id, circle_id)`). This naturally indexes the exact queries we use for lookups and acts as a strict constraint preventing duplicate records from being inserted.
+* **Foreign Key Cascades:** All relationships enforce `ON DELETE CASCADE`. If a user or circle is deleted, their associated topics and memberships are automatically purged, preventing orphaned data without requiring extra Python application logic.
+* **SQLite Triggers for Aggregation:** I added DB-level triggers (`trg_increment_member_count`, `trg_decrement_member_count`) to automatically sync the `member_count` column on the `circles` table whenever a membership is added or removed. This trades a minor write-penalty for absolute O(1) performance on the highly-frequented read path (evaluating if a circle has reached `max_members`).
+
 ## Technical Decisions
 1. **The Single Parameterized CTE (Common Table Expression)**: 
    Instead of pulling all data into Python and filtering it in memory, we pushed the elimination logic (capacities, join policies, inactive circles, and already-joined circles) down into the database via a single parameterized SQL query. This acts as a highly optimized "Hard Filter" and efficiently computes base feature counts (like `topic_overlap_count` and demographic booleans) before Python ever touches the data.
 2. **Log-Normalized Activity Scoring**: 
-   Circle engagement often follows a power-law distribution. A circle with 1,000 messages shouldn't entirely mathematically eclipse a circle with 50 messages if the topic overlap is strong. I used `min(log10(1 + posts + chats) / 3.0, 1.0)` to normalize activity on a 0-to-1 curve.
+   Circle engagement often follows a power-law distribution. A circle with 1,000 messages shouldn't entirely mathematically eclipse a circle with 50 messages if the topic overlap is strong. I used `min(log10(1 + posts + chats + engagement) / 3.0, 1.0)` to normalize activity on a 0-to-1 curve.
 3. **Greedy MMR (Maximal Marginal Relevance) for Diversity**: 
    To solve the "Duplicate Circles" problem, we implemented a greedy MMR algorithm. It evaluates a top-K candidate pool iteratively. Once a circle is selected, the remaining unselected candidates are penalized based on their Jaccard Similarity to the *already selected* topics: `Adjusted = 0.75 * BaseScore - 0.25 * Penalty`. This seamlessly pushes duplicate niche circles down the ranking.
 
@@ -28,4 +36,4 @@ If taking this to production to support millions of women, we would implement:
 AI was heavily leveraged throughout this project as a pair-programmer:
 * **TDD & Scaffolding**: LLMs were used to instantly generate boilerplate, `pytest` fixtures, and the foundational environment pipeline (Makefiles, project structure).
 * **Algorithm Tuning**: AI helped rapidly conceptualize and debug the edge cases in the Greedy MMR mathematics.
-* **Raw SQL Generation**: The complex Common Table Expression (CTE) query was scaffolded by an LLM, allowing us to rapidly iterate on database-level filtering without manually debugging `GROUP BY` and `JOIN` syntax.
+* **Raw SQL Generation**: The complex Common Table Expression (CTE) query was scaffolded by an LLM, allowing me to rapidly iterate on database-level filtering without manually debugging `GROUP BY` and `JOIN` syntax.

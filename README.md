@@ -1,4 +1,4 @@
-# connect.li.api (Lean In Connect Circles API Project)
+# Lean In Connect Circles API Project
 
 A stateless, RESTful Python API for recommending Lean In Connect Circles to users.
 
