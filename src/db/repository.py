@@ -1,5 +1,4 @@
 import sqlite3
-from typing import List
 
 from src.models import CandidateCircle
 
@@ -40,7 +39,7 @@ class Repository:
             return True
         return row["topic_count"] == 0 and not row["industry"] and not row["location"]
 
-    def get_candidate_circles_cte(self, user_id: int) -> List[CandidateCircle]:
+    def get_candidate_circles_cte(self, user_id: int) -> list[CandidateCircle]:
         """
         Executes a single parameterized SQL query using Common Table Expressions (CTEs)
         to aggressively filter invalid candidates at the DB layer, and compute match signals.
