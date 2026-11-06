@@ -52,7 +52,8 @@ def get_recommendations(
     candidates = repo.get_candidate_circles_cte(user_id)
     
     # 3. Base Scoring Component
-    scored_candidates = [(c, compute_base_score(c)) for c in candidates]
+    is_cold = repo.is_cold_start_user(user_id)
+    scored_candidates = [(c, compute_base_score(c, is_cold_start=is_cold)) for c in candidates]
     
     # 4. Sorting
     sorted_candidates = sort_candidates(scored_candidates)

@@ -7,7 +7,7 @@ def generate_explanation(circle: CandidateCircle, breakdown: ScoreBreakdown) -> 
     and the rules laid out in the architectural contract.
     """
     # Rule 1: Cold-Start
-    if breakdown.topic_score == 0.0 and breakdown.demo_score == 0.0:
+    if breakdown.is_cold_start:
         return "A highly active community to help you get started."
         
     # Rule 2: Diversity Penalty
