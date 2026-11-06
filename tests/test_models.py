@@ -13,10 +13,10 @@ from src.models import (
 def test_enum_values():
     assert AccessType.PUBLIC == "public"
     assert AccessType.UNLISTED == "unlisted"
-    
+
     assert JoinPolicyType.OPEN == "open"
     assert JoinPolicyType.REQUEST == "request"
-    
+
     assert FormatType.IN_PERSON == "in_person"
     assert FormatType.VIRTUAL == "virtual"
     assert FormatType.HYBRID == "hybrid"
