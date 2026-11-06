@@ -43,6 +43,14 @@ class CandidateCircle(BaseModel):
     location_match: bool
 
 
+class ScoreBreakdown(BaseModel):
+    base_score: float
+    topic_score: float
+    demo_score: float
+    act_score: float
+    mmr_penalty_applied: bool = False
+
+
 class RecommendationExplanation(BaseModel):
     reason: str
 
