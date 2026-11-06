@@ -86,13 +86,13 @@ class Repository:
             (
                 SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
                 FROM circle_leaders cl
-                JOIN user_info ui ON (cl.industry = ui.industry AND ui.industry IS NOT NULL)
+                JOIN user_info ui ON (cl.industry = ui.industry AND ui.industry IS NOT NULL AND ui.industry != '')
                 WHERE cl.circle_id = c.id
             ) AS industry_match,
             (
                 SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
                 FROM circle_leaders cl
-                JOIN user_info ui ON (cl.location = ui.location AND ui.location IS NOT NULL)
+                JOIN user_info ui ON (cl.location = ui.location AND ui.location IS NOT NULL AND ui.location != '')
                 WHERE cl.circle_id = c.id
             ) AS location_match,
             (
